@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Foundation\Application;
-use Laravel\Sanctum\Http\MiddlewareEnsureFrontendRequestAreStateful;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use Spatie\Multitenancy\Http\Middleware\EnsureValidTenantSession;
+use Spatie\Multitenancy\Http\Middleware\NeedsTenant;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,9 +15,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-    $middleware->api(prepend: [
-        EnsureFrontendRequestsAreStateful::class,
-         ]);
+        if (($_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? null) !== 'testing') {
+            $middleware->web(append: [
+                NeedsTenant::class,
+                EnsureValidTenantSession::class,
+            ]);
+        }
+
+        $middleware->api(prepend: [
+            EnsureFrontendRequestsAreStateful::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
