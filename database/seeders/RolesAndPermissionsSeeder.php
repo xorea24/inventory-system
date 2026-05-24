@@ -3,38 +3,36 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
     public function run(): void
     {
-        // Reset cached roles and permissions
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        // ─── Define all permissions ───────────────────────────────────────
         $permissions = [
-
             // Users
             'user.view', 'user.create', 'user.edit', 'user.deactivate',
 
-            // Products & Stock
+            // Products and stock
             'product.view', 'product.create', 'product.edit', 'product.delete',
             'stock.view', 'stock.adjust',
 
-            // Inbound / Purchase Orders
+            // Inbound / purchase orders
             'purchase_order.view', 'purchase_order.create',
             'purchase_order.edit', 'purchase_order.receive',
 
-            // Outbound / Sales Orders
+            // Outbound / sales orders
             'sales_order.view', 'sales_order.create',
             'sales_order.edit', 'sales_order.dispatch',
 
             // Transfers
             'transfer.view', 'transfer.create', 'transfer.confirm',
 
-            // Warehouses & Locations
+            // Warehouses and locations
             'warehouse.view', 'warehouse.manage',
 
             // Reports
@@ -45,17 +43,16 @@ class RolesAndPermissionsSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+            Permission::firstOrCreate([
+                'name' => $permission,
+                'guard_name' => 'web',
+            ]);
         }
 
-        // ─── Admin ────────────────────────────────────────────────────────
-        // Full access to everything
-        $admin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-        $admin->syncPermissions(Permission::all());
+        $admin = $this->role('Admin');
+        $admin->syncPermissions(Permission::where('guard_name', 'web')->get());
 
-        // ─── Manager ──────────────────────────────────────────────────────
-        // Can do everything except settings & user deactivation
-        $manager = Role::firstOrCreate(['name' => 'manager', 'guard_name' => 'web']);
+        $manager = $this->role('Manager');
         $manager->syncPermissions([
             'user.view', 'user.create', 'user.edit',
             'product.view', 'product.create', 'product.edit',
@@ -69,9 +66,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'report.view', 'report.export',
         ]);
 
-        // ─── Staff ────────────────────────────────────────────────────────
-        // Day-to-day warehouse operations only
-        $staff = Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'web']);
+        $staff = $this->role('Staff');
         $staff->syncPermissions([
             'product.view',
             'stock.view', 'stock.adjust',
@@ -82,9 +77,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'report.view',
         ]);
 
-        // ─── Viewer ───────────────────────────────────────────────────────
-        // Read-only access — cannot modify anything
-        $viewer = Role::firstOrCreate(['name' => 'viewer', 'guard_name' => 'web']);
+        $viewer = $this->role('Viewer');
         $viewer->syncPermissions([
             'product.view',
             'stock.view',
@@ -95,15 +88,36 @@ class RolesAndPermissionsSeeder extends Seeder
             'report.view',
         ]);
 
-        $this->command->info('✅ Roles and permissions seeded successfully!');
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        $this->command->info('Roles and permissions seeded successfully.');
         $this->command->table(
             ['Role', 'Permissions Count'],
             [
-                ['admin',   Permission::count()],
-                ['manager', $manager->permissions->count()],
-                ['staff',   $staff->permissions->count()],
-                ['viewer',  $viewer->permissions->count()],
+                ['Admin', $admin->permissions->count()],
+                ['Manager', $manager->permissions->count()],
+                ['Staff', $staff->permissions->count()],
+                ['Viewer', $viewer->permissions->count()],
             ]
         );
+    }
+
+    private function role(string $name): Role
+    {
+        $role = Role::query()
+            ->where('guard_name', 'web')
+            ->whereRaw('LOWER(name) = ?', [strtolower($name)])
+            ->first();
+
+        if ($role) {
+            $role->update(['name' => $name]);
+
+            return $role;
+        }
+
+        return Role::create([
+            'name' => $name,
+            'guard_name' => 'web',
+        ]);
     }
 }
