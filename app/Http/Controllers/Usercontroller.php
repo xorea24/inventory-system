@@ -37,16 +37,16 @@ class UserController extends Controller
         $this->authorize('user.create');
 
         $validated = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'role'     => 'required|exists:roles,name',
+            'role' => 'required|exists:roles,name',
         ]);
 
         $user = User::create([
-            'name'      => $validated['name'],
-            'email'     => $validated['email'],
-            'password'  => Hash::make($validated['password']),
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
             'is_active' => true,
         ]);
 
@@ -78,16 +78,16 @@ class UserController extends Controller
         $this->authorize('user.edit');
 
         $validated = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => "required|email|unique:users,email,{$user->id}",
+            'name' => 'required|string|max:255',
+            'email' => "required|email|unique:users,email,{$user->id}",
             'password' => 'nullable|string|min:8|confirmed',
-            'role'     => 'required|exists:roles,name',
+            'role' => 'required|exists:roles,name',
         ]);
 
         $oldRole = $user->getRoleNames()->first();
 
         $user->update([
-            'name'  => $validated['name'],
+            'name' => $validated['name'],
             'email' => $validated['email'],
             ...($validated['password']
                 ? ['password' => Hash::make($validated['password'])]
