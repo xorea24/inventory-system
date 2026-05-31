@@ -16,15 +16,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(RolesAndPermissionsSeeder::class);
+        $this->call([
+            RolesAndPermissionsSeeder::class,
+            DemoWarehouseSeeder::class,
+        ]);
 
         $admin = User::updateOrCreate([
             'email' => 'admin@inventory.test',
         ], [
             'name' => 'Inventory Admin',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('admin123'),
         ]);
-
+        
         $admin->syncRoles(['Admin']);
     }
 }

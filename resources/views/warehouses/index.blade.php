@@ -41,7 +41,11 @@
                         <tbody class="divide-y divide-gray-200 bg-white">
                             @forelse ($warehouses as $warehouse)
                                 <tr>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ $warehouse->name }}</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                                        <a href="{{ route('warehouses.show', $warehouse) }}" class="text-indigo-600 hover:text-indigo-900">
+                                            {{ $warehouse->name }}
+                                        </a>
+                                    </td>
                                     <td class="px-6 py-4 text-sm text-gray-600">{{ $warehouse->address ?: 'Not set' }}</td>
                                     <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">{{ $warehouse->country ?: 'Not set' }}</td>
                                     @can('warehouse.manage')

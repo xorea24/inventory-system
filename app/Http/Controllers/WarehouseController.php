@@ -86,6 +86,15 @@ class WarehouseController extends Controller
             ->with('success', "Warehouse {$name} deleted successfully.");
     }
 
+    public function show(Warehouse $warehouse): View
+    {
+        $this->authorize('warehouse.view');
+
+        $zones = $warehouse->zones()->orderBy('name')->paginate(15);
+
+        return view('warehouses.show', compact('warehouse', 'zones'));
+    }
+
     /**
      * @return array{name: string, address?: string|null, country?: string|null}
      */

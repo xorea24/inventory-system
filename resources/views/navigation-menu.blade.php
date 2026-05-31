@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="block h-9 w-auto" />
+                        <img src="{{ asset('images/inventory.png') }}" alt="Inventory Logo" class="block h-9 w-auto" />
                     </a>
                 </div>
 
@@ -31,6 +31,12 @@
 
                         <x-nav-link href="{{ route('bins.index') }}" :active="request()->routeIs('bins.*')">
                             {{ __('Bins') }}
+                        </x-nav-link>
+                    @endcan
+
+                    @can('user.view')
+                        <x-nav-link href="{{ route('users.index') }}" :active="request()->routeIs('users.*')">
+                            {{ __('Users') }}
                         </x-nav-link>
                     @endcan
 
@@ -196,6 +202,12 @@
                 </x-responsive-nav-link>
             @endcan
 
+            @can('user.view')
+                <x-responsive-nav-link href="{{ route('users.index') }}" :active="request()->routeIs('users.*')">
+                    {{ __('Users') }}
+                </x-responsive-nav-link>
+            @endcan
+
             @can('settings.manage')
                 <x-responsive-nav-link href="{{ route('roles.index') }}" :active="request()->routeIs('roles.*')">
                     {{ __('Roles') }}
@@ -206,6 +218,16 @@
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="flex items-center px-4">
+                <div class="shrink-0 me-3">
+                    <x-application-mark class="block h-10 w-auto" />
+                </div>
+
+                <div>
+                    <div class="font-bold text-base text-gray-800">Inventory System</div>
+                </div>
+            </div>
+
+            <div class="flex items-center px-4 mt-3">
                 @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
                     <div class="shrink-0 me-3">
                         <img class="size-10 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}"

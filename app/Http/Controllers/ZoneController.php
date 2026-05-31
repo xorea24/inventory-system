@@ -20,12 +20,17 @@ class ZoneController extends Controller
         return view('zones.index', compact('zones'));
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
         $this->authorize('warehouse.manage');
 
+        $zone = new Zone;
+        if ($request->has('warehouse_id')) {
+            $zone->warehouse_id = $request->integer('warehouse_id');
+        }
+
         return view('zones.create', [
-            'zone' => new Zone,
+            'zone' => $zone,
             'warehouses' => Warehouse::orderBy('name')->get(),
         ]);
     }
@@ -71,6 +76,15 @@ class ZoneController extends Controller
         $zone->delete();
 
         return redirect()->route('zones.index')->with('success', "Zone {$name} deleted successfully.");
+    }
+
+    public function show(Zone $zone): View
+    {
+        $this->authorize('warehouse.view');
+
+        $aisles = $zone->aisles()->with('zone.warehouse')->orderBy('name')->paginate(15);
+
+        return view('zones.show', compact('zone', 'aisles'));
     }
 
     /**

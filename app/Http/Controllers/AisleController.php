@@ -20,12 +20,17 @@ class AisleController extends Controller
         return view('aisles.index', compact('aisles'));
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
         $this->authorize('warehouse.manage');
 
+        $aisle = new Aisle;
+        if ($request->has('zone_id')) {
+            $aisle->zone_id = $request->integer('zone_id');
+        }
+
         return view('aisles.create', [
-            'aisle' => new Aisle,
+            'aisle' => $aisle,
             'zones' => Zone::with('warehouse')->orderBy('name')->get(),
         ]);
     }
@@ -71,6 +76,15 @@ class AisleController extends Controller
         $aisle->delete();
 
         return redirect()->route('aisles.index')->with('success', "Aisle {$name} deleted successfully.");
+    }
+
+    public function show(Aisle $aisle): View
+    {
+        $this->authorize('warehouse.view');
+
+        $bins = $aisle->bins()->with('aisle.zone.warehouse')->orderBy('name')->paginate(15);
+
+        return view('aisles.show', compact('aisle', 'bins'));
     }
 
     /**

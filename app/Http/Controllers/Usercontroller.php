@@ -41,6 +41,7 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|exists:roles,name',
+            'warehouse_id' => 'nullable|exists:warehouses,id',
         ]);
 
         $user = User::create([
@@ -48,6 +49,7 @@ class UserController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'is_active' => true,
+            'warehouse_id' => $validated['warehouse_id'],
         ]);
 
         $user->assignRole($validated['role']);
@@ -82,6 +84,7 @@ class UserController extends Controller
             'email' => "required|email|unique:users,email,{$user->id}",
             'password' => 'nullable|string|min:8|confirmed',
             'role' => 'required|exists:roles,name',
+            'warehouse_id' => 'nullable|exists:warehouses,id',
         ]);
 
         $oldRole = $user->getRoleNames()->first();
@@ -89,6 +92,7 @@ class UserController extends Controller
         $user->update([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'warehouse_id' => $validated['warehouse_id'],
             ...($validated['password']
                 ? ['password' => Hash::make($validated['password'])]
                 : []),

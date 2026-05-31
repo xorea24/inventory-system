@@ -22,12 +22,17 @@ class BinController extends Controller
         return view('bins.index', compact('bins'));
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
         $this->authorize('warehouse.manage');
 
+        $bin = new Bin;
+        if ($request->has('aisle_id')) {
+            $bin->aisle_id = $request->integer('aisle_id');
+        }
+
         return view('bins.create', [
-            'bin' => new Bin,
+            'bin' => $bin,
             'aisles' => Aisle::with('zone.warehouse')->orderBy('name')->get(),
         ]);
     }

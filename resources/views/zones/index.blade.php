@@ -29,8 +29,16 @@
                         <tbody class="divide-y divide-gray-200 bg-white">
                             @forelse ($zones as $zone)
                                 <tr>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ $zone->name }}</td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">{{ $zone->warehouse->name }}</td>
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                                        <a href="{{ route('zones.show', $zone) }}" class="text-indigo-600 hover:text-indigo-900">
+                                            {{ $zone->name }}
+                                        </a>
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
+                                        <a href="{{ route('warehouses.show', $zone->warehouse) }}" class="text-indigo-600 hover:text-indigo-900">
+                                            {{ $zone->warehouse->name }}
+                                        </a>
+                                    </td>
                                     @can('warehouse.manage')
                                         <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                                             <div class="flex justify-end gap-4">
