@@ -15,11 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->alias([
-            'tenant' => [
-                NeedsTenant::class,
-                EnsureValidTenantSession::class,
-            ],
+        $middleware->group('tenant', [
+            NeedsTenant::class,
+            EnsureValidTenantSession::class,
         ]);
 
         $middleware->api(prepend: [

@@ -3,30 +3,28 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class Product extends Model
+class ProductVariant extends Model
 {
     use LogsActivity;
 
     protected $fillable = [
+        'product_id',
         'sku',
         'barcode',
         'uom',
         'name',
         'description',
-        'category',
         'quantity',
-        'reorder_level',
         'unit_price',
-        'supplier',
     ];
 
-    public function variants(): HasMany
+    public function product(): BelongsTo
     {
-        return $this->hasMany(ProductVariant::class);
+        return $this->belongsTo(Product::class);
     }
 
     public function getActivitylogOptions(): LogOptions

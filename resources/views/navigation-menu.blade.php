@@ -16,6 +16,12 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    @can('product.view')
+                        <x-nav-link href="{{ route('products.index') }}" :active="request()->routeIs('products.*')">
+                            {{ __('Products') }}
+                        </x-nav-link>
+                    @endcan
+
                     @can('warehouse.view')
                         <x-nav-link href="{{ route('warehouses.index') }}" :active="request()->routeIs('warehouses.*')">
                             {{ __('Warehouses') }}
@@ -183,6 +189,12 @@
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            @can('product.view')
+                <x-responsive-nav-link href="{{ route('products.index') }}" :active="request()->routeIs('products.*')">
+                    {{ __('Products') }}
+                </x-responsive-nav-link>
+            @endcan
 
             @can('warehouse.view')
                 <x-responsive-nav-link href="{{ route('warehouses.index') }}" :active="request()->routeIs('warehouses.*')">

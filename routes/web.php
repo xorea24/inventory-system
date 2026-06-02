@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AisleController;
 use App\Http\Controllers\BinController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductVariantController;
 use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
@@ -26,6 +28,15 @@ Route::middleware([
     Route::put('roles/{role}/permissions', [RolePermissionController::class, 'update'])->name('roles.permissions.update');
 
     Route::resource('warehouses', WarehouseController::class);
+    Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
+    Route::resource('products', ProductController::class);
+    Route::prefix('products/{product}/variants')->name('products.variants.')->group(function () {
+        Route::get('create', [ProductVariantController::class, 'create'])->name('create');
+        Route::post('/', [ProductVariantController::class, 'store'])->name('store');
+        Route::get('{variant}/edit', [ProductVariantController::class, 'edit'])->name('edit');
+        Route::put('{variant}', [ProductVariantController::class, 'update'])->name('update');
+        Route::delete('{variant}', [ProductVariantController::class, 'destroy'])->name('destroy');
+    });
     Route::resource('zones', ZoneController::class);
     Route::resource('aisles', AisleController::class);
     Route::get('bins/{bin}/barcode', [BinController::class, 'barcode'])->name('bins.barcode');
